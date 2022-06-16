@@ -17,7 +17,7 @@
     <ul class="colors colors--black">
       <li class="colors__item" v-for="color in productColors" :key="product.title + color">
         <label class="colors__label">
-          <input class="colors__radio sr-only" type="radio" :value="color.id">
+          <input class="colors__radio sr-only" type="radio" :value="color.id" v-model="selectedColor">
           <span class="colors__value" :style="{'background-color': color.color,}">
           </span>
         </label>
@@ -31,6 +31,11 @@ import colors from '@/data/colors'
 
 export default {
   props: ['product'],
+  data: function () {
+    return {
+      selectedColor: this.product.colorId[0]
+    }
+  },
   computed: {
     productColors () {
       return colors.filter((color) => {
