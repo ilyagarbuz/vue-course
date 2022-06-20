@@ -32,6 +32,11 @@ export default {
   },
   methods: {
     paginate (page) {
+      if (page > this.pages) {
+        page = this.pages
+      } else if (page < 1) {
+        page = 1
+      }
       return this.$emit('update:page', page)
     }
   }
