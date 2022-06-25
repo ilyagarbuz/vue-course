@@ -63,25 +63,12 @@
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-                <li class="colors__item">
+                <li class="colors__item" v-for="color in productColors" :key="product.title + color.id">
                   <label class="colors__label">
-                    <input class="colors__radio sr-only" type="radio" name="color-item" value="blue" checked="">
-                    <span class="colors__value" style="background-color: #73B6EA;">
+                    <input class="colors__radio sr-only" type="radio" :value="color.id">
+                    <span class="colors__value" :style="{'background-color': color.color}">
                     </span>
                   </label>
-                </li>
-                <li class="colors__item">
-                  <label class="colors__label">
-                    <input class="colors__radio sr-only" type="radio" name="color-item" value="yellow">
-                    <span class="colors__value" style="background-color: #FFBE15;">
-                    </span>
-                  </label>
-                </li>
-                <li class="colors__item">
-                  <label class="colors__label">
-                    <input class="colors__radio sr-only" type="radio" name="color-item" value="gray">
-                    <span class="colors__value" style="background-color: #939393;">
-                  </span></label>
                 </li>
               </ul>
             </fieldset>
@@ -118,21 +105,8 @@
             </fieldset>
 
             <div class="item__row">
-              <div class="form__counter">
-                <button type="button" aria-label="Убрать один товар" @click="productAmount = minusAmount(productAmount)">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="#icon-minus"></use>
-                  </svg>
-                </button>
 
-                <input type="text" disabled v-model.number="productAmount">
-
-                <button type="button" aria-label="Добавить один товар" @click="productAmount = plusAmount(productAmount)">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="#icon-plus"></use>
-                  </svg>
-                </button>
-              </div>
+              <CartCounter :product-amount.sync="productAmount"/>
 
               <button class="button button--primery" type="submit">
                 В корзину
@@ -200,13 +174,17 @@ import gotoPage from '@/helpers/gotoPage'
 import products from '@/data/products'
 import categories from '@/data/categories'
 import numberFormat from '@/helpers/numberFormat'
-import { plusAmount, minusAmount } from '@/helpers/productCounter'
+import CartCounter from '@/components/CartCounter.vue'
+import colors from '@/data/colors'
 
 export default {
   data () {
     return {
       productAmount: 1
     }
+  },
+  components: {
+    CartCounter
   },
   filters: {
     numberFormat
@@ -217,6 +195,12 @@ export default {
     },
     category () {
       return categories.find(category => category.id === this.product.categoryId)
+    },
+    productColors () {
+      return colors.filter((color) => {
+        if (this.product.colorId.indexOf(color.id) >= 0) return true
+        return false
+      })
     }
   },
   methods: {
@@ -226,9 +210,7 @@ export default {
         'addProductToCart',
         { productId: this.product.id, amount: this.productAmount }
       )
-    },
-    plusAmount,
-    minusAmount
+    }
   }
 }
 

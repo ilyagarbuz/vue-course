@@ -10,21 +10,7 @@
       Артикул: {{product.product.id}}
     </span>
 
-    <div class="product__counter form__counter">
-      <button type="button" aria-label="Убрать один товар" @click="amount = minusAmount(amount)">
-        <svg width="10" height="10" fill="currentColor">
-          <use xlink:href="#icon-minus"></use>
-        </svg>
-      </button>
-
-      <input type="text" disabled v-model.number="amount">
-
-      <button type="button" aria-label="Добавить один товар" @click="amount = plusAmount(amount)">
-        <svg width="10" height="10" fill="currentColor">
-          <use xlink:href="#icon-plus"></use>
-        </svg>
-      </button>
-    </div>
+      <CartCounter :product-amount.sync="amount"/>
 
     <b class="product__price">
       {{product.amount * product.product.price | numberFormat}} ₽
@@ -42,10 +28,14 @@
 import numberFormat from '@/helpers/numberFormat'
 import { mapMutations } from 'vuex'
 import { plusAmount, minusAmount } from '@/helpers/productCounter'
+import CartCounter from './CartCounter.vue'
 
 export default {
   filters: { numberFormat },
   props: ['product'],
+  components: {
+    CartCounter
+  },
   computed: {
     amount: {
       get () {
