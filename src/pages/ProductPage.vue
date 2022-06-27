@@ -1,5 +1,7 @@
 <template>
-  <main class="content container">
+  <main class="content container" v-if="productLoading">Загрузка товара...</main>
+  <main class="content container" v-else-if="!productData">Не удалось загрузить товар <button @click="loadProduct">Попробуйте ещё раз</button></main>
+  <main class="content container" v-else>
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -63,10 +65,10 @@
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-                <li class="colors__item" v-for="color in productColors" :key="product.title + color.id">
+                <li class="colors__item" v-for="color in productData.colors" :key="color.id">
                   <label class="colors__label">
                     <input class="colors__radio sr-only" type="radio" :value="color.id">
-                    <span class="colors__value" :style="{'background-color': color.color}">
+                    <span class="colors__value" :style="{'background-color': color.code}">
                     </span>
                   </label>
                 </li>
@@ -106,12 +108,17 @@
 
             <div class="item__row">
 
-              <CartCounter :product-amount.sync="productAmount"/>
+              <CartCounter :productAmount.sync="productAmount" />
 
-              <button class="button button--primery" type="submit">
+              <button class="button button--primery" type="submit" :disabled="productAddSending">
                 В корзину
               </button>
+
+              <div v-show="productAdded">Товар добавлен в корзину</div>
+              <div v-show="productAddSending">Добавление товара в козину</div>
+
             </div>
+
           </form>
         </div>
       </div>
@@ -171,16 +178,21 @@
 
 <script>
 import gotoPage from '@/helpers/gotoPage'
-import products from '@/data/products'
-import categories from '@/data/categories'
 import numberFormat from '@/helpers/numberFormat'
 import CartCounter from '@/components/CartCounter.vue'
-import colors from '@/data/colors'
+import axios from 'axios'
+import { API_BASE_URL } from '@/config'
+import { mapActions } from 'vuex'
 
 export default {
   data () {
     return {
-      productAmount: 1
+      productAmount: 1,
+      productData: null,
+      productLoading: false,
+      productLoadingFailed: false,
+      productAdded: false,
+      productAddSending: false
     }
   },
   components: {
@@ -191,25 +203,44 @@ export default {
   },
   computed: {
     product () {
-      return products.find(product => product.id === +this.$route.params.id)
+      return {
+        ...this.productData,
+        image: this.productData.image.file.url
+      }
     },
     category () {
-      return categories.find(category => category.id === this.product.categoryId)
-    },
-    productColors () {
-      return colors.filter((color) => {
-        if (this.product.colorId.indexOf(color.id) >= 0) return true
-        return false
-      })
+      return this.productData.category
     }
   },
   methods: {
+    ...mapActions(['addProductToCart']),
     gotoPage,
+
     addToCart () {
-      this.$store.commit(
-        'addProductToCart',
-        { productId: this.product.id, amount: this.productAmount }
-      )
+      this.productAdded = false
+      this.productAddSending = true
+
+      this.addProductToCart({ productId: this.product.id, amount: this.productAmount })
+        .then(() => {
+          this.productAdded = true
+          this.productAddSending = false
+        })
+    },
+    loadProduct () {
+      this.productLoading = true
+      this.productLoadingFailed = false
+      axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
+        .then(res => { this.productData = res.data })
+        .catch(() => { this.productLoadingFailed = true })
+        .then(() => { this.productLoading = false })
+    }
+  },
+  watch: {
+    '$route.params.id': {
+      handler () {
+        this.loadProduct()
+      },
+      immediate: true
     }
   }
 }

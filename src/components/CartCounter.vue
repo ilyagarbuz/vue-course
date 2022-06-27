@@ -31,11 +31,7 @@ export default {
       },
 
       set (value) {
-        if (typeof value === 'string') {
-          this.$emit('update:product-amount', 1)
-        } else {
-          this.$emit('update:product-amount', value)
-        }
+        this.$emit('update:product-amount', value)
       }
     }
   }

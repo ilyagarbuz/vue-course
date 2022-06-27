@@ -1,7 +1,7 @@
 <template>
   <li class="cart__item product">
     <div class="product__pic">
-      <img :src="product.product.image" width="120" height="120" srcset="img/phone-square-3@2x.jpg 2x" :alt="product.product.title">
+      <img :src="product.product.image" width="120" height="120" :alt="product.product.title">
     </div>
     <h3 class="product__title">
       {{product.product.title}}
@@ -10,13 +10,13 @@
       Артикул: {{product.product.id}}
     </span>
 
-      <CartCounter :product-amount.sync="amount"/>
+    <CartCounter :product-amount.sync="amount" />
 
     <b class="product__price">
       {{product.amount * product.product.price | numberFormat}} ₽
     </b>
 
-    <button class="product__del button-del" type="button" aria-label="Удалить товар из корзины" @click.prevent="deleteProduct(product.productId)">
+    <button class="product__del button-del" type="button" aria-label="Удалить товар из корзины" @click.prevent="deleteProduct(product.product.id)">
       <svg width="20" height="20" fill="currentColor">
         <use xlink:href="#icon-close"></use>
       </svg>
@@ -26,9 +26,9 @@
 
 <script>
 import numberFormat from '@/helpers/numberFormat'
-import { mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 import { plusAmount, minusAmount } from '@/helpers/productCounter'
-import CartCounter from './CartCounter.vue'
+import CartCounter from '@/components/CartCounter.vue'
 
 export default {
   filters: { numberFormat },
@@ -43,7 +43,7 @@ export default {
       },
 
       set (value) {
-        this.$store.commit(
+        this.$store.dispatch(
           'updateCartProductAmount',
           { productId: this.product.productId, amount: value }
         )
@@ -51,7 +51,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations({ deleteProduct: 'deleteProduct' }),
+    ...mapActions({ deleteProduct: 'deleteProduct' }),
     plusAmount,
     minusAmount
   }

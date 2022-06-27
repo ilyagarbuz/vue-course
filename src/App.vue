@@ -12,7 +12,7 @@
           8 800 600 90 09
         </a>
 
-        <CartIndicator />
+        <CartIndicator :loading="cartLoading"/>
 
       </div>
     </header>
@@ -114,10 +114,28 @@
 </template>
 
 <script>
+import { mapActions, mapMutations } from 'vuex'
 import CartIndicator from './components/CartIndicator.vue'
 
 export default {
-  components: { CartIndicator }
+  data () {
+    return {
+      cartLoading: false
+    }
+  },
+  components: { CartIndicator },
+  methods: {
+    ...mapActions(['loadCart']),
+    ...mapMutations(['updateUserAccessKey'])
+  },
+  created () {
+    const userAccessKey = localStorage.getItem('userAccessKey')
+    if (userAccessKey) {
+      this.updateUserAccessKey(userAccessKey)
+    }
+    this.cartLoading = true
+    this.loadCart().then(() => { this.cartLoading = false })
+  }
 
 }
 </script>
