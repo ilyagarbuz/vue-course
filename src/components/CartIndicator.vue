@@ -12,7 +12,6 @@
 import CartLoader from '@/ui/CartLoader.vue'
 export default {
   props: ['loading'],
-  computed: { CartLoader },
   components: { CartLoader }
 }
 </script>

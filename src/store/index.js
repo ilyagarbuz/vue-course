@@ -25,6 +25,9 @@ export default new Vuex.Store({
     updateCartProductsData (state, data) {
       this.state.cartProductsData = data
     },
+    updateCartProducts (state, productId) {
+      state.cartProducts = state.cartProducts.filter(p => p.productId !== productId)
+    },
     syncCartProducts (state) {
       this.state.cartProducts = this.state.cartProductsData.map(item => {
         return {
@@ -110,6 +113,8 @@ export default new Vuex.Store({
         .catch(() => context.commit('syncCartProducts'))
     },
     deleteProduct (context, productId) {
+      context.commit('updateCartProducts', productId)
+
       return axios
         .delete(API_BASE_URL + '/api/baskets/products', {
           data: {
@@ -121,8 +126,8 @@ export default new Vuex.Store({
         })
         .then(res => {
           context.commit('updateCartProductsData', res.data.items)
-          context.commit('syncCartProducts')
         })
+        .catch(() => context.commit('syncCartProducts'))
     }
   }
 })
