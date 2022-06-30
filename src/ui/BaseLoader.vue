@@ -12,8 +12,8 @@ export default {
     border: 6px solid #f3f3f3; /* Light grey */
     border-top: 6px solid #9eff00; /* Blue */
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     animation: spin 1s linear infinite;
   }
 
