@@ -231,7 +231,10 @@ export default {
       this.productLoadingFailed = false
       axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
         .then(res => { this.productData = res.data })
-        .catch(() => { this.productLoadingFailed = true })
+        .catch(() => {
+          this.productLoadingFailed = true
+          this.$router.push({ name: 'notFound' })
+        })
         .then(() => { this.productLoading = false })
     }
   },

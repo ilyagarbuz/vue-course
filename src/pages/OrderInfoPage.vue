@@ -120,12 +120,18 @@ export default {
       })
     }
   },
-  created () {
-    if (this.$store.state.orderInfo && this.$store.state.orderInfo.id === this.$route.params.id) return
+  watch: {
+    '$route.params.id': {
+      handler () {
+        if (this.$store.state.orderInfo && this.$store.state.orderInfo.id === this.$route.params.id) return
 
-    this.orderInfoLoading = true
-    this.$store.dispatch('loadOrderInfo', this.$route.params.id)
-      .finally(() => { this.orderInfoLoading = false })
+        this.orderInfoLoading = true
+        this.$store.dispatch('loadOrderInfo', this.$route.params.id)
+          .catch(() => { this.$router.push({ name: 'notFound' }) })
+          .finally(() => { this.orderInfoLoading = false })
+      },
+      immediate: true
+    }
   }
 }
 </script>
